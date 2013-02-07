@@ -51,7 +51,16 @@ module Globalize
 
         def complete_translated_fields
           translated_attribute_names.each do |name|
-            fields[name] = column_type(name) unless fields[name]
+            # you only support 2 effing types, it's either specified or defaulted,
+            # otherwise you throw an error for no good reason and drive somebody like
+            # me mad because somehow the system knows about translated attributes
+            # before the migration adding them is run on a fresh install.
+            
+            #begin necessary code stink
+            __type = column_type(name)
+            __type ||= :text # all explicit and shit
+            # end code stink
+            fields[name] = __type unless fields[name]
           end
         end
 
